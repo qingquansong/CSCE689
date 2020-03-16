@@ -8,7 +8,6 @@ from torch import optim
 from torch.optim import lr_scheduler
 
 from opts import parse_opts
-from model import generate_model
 from mean import get_mean, get_std
 from spatial_transforms import (
     Compose, Normalize, Scale, CenterCrop, CornerCrop, MultiScaleCornerCrop,
@@ -32,7 +31,6 @@ from sklearn.metrics import accuracy_score
 from models import *
 
 
-
 from models.resnext import get_fine_tuning_parameters
 from models import resnext
 
@@ -52,8 +50,9 @@ def main():
     # wrap the current model again in nn.DataParallel / or we can just remove the .module keys.
     model = nn.DataParallel(model, device_ids=None)
     # filter out unnecessary keys
-    pretrain = torch.load('./pretrain/'+model_name+'.pth')
+    pretrain = torch.load('/data/qq/CSCE689/pretrain/'+model_name+'.pth')
     pretrain_dict = pretrain['state_dict']
+    # pretrain_dict_filter = {k: v for k, v in pretrain_dict.items() if k in model_dict}
 
     pretrain_dict.pop('module.fc.weight')
     pretrain_dict.pop('module.fc.bias')
@@ -62,6 +61,7 @@ def main():
     model.load_state_dict(model_dict)
 
 
+    # load preprocessed video frames and annotation
     from datasets.ucf101 import UCF101
     root_path = '/data/qq/CSCE689/video/'
     video_path = root_path + 'UCF-music/'  # 'UCF-101-jpg/' 
@@ -105,7 +105,7 @@ def main():
         batch_size=batch_size,
         shuffle=False,
         num_workers=n_threads,
-        pin_memory=True)
+        pin_memory=False) # True
 
     # get validation data
     val_data = UCF101(
@@ -124,7 +124,9 @@ def main():
         batch_size=batch_size,
         shuffle=False,
         num_workers=n_threads,
-        pin_memory=True)
+        pin_memory=False) # True
+
+
 
 
 
@@ -135,7 +137,7 @@ def main():
         "root_path": '',
         "video_path": 'video_kinetics_jpg',
         "annotation_path": 'kinetics.json',
-        "result_path": 'results',
+        "result_path": 'results1',
         "dataset": 'ucf101-music', # 'ucf101',
         "n_classes": 9, # 101, 
         "n_finetune_classes": 9, # 101,
@@ -156,12 +158,12 @@ def main():
         "optimizer": 'sgd',
         "lr_patience": 10,
         "batch_size": 32,
-        "n_epochs": 200,
+        "n_epochs": 20,
         "begin_epoch": 1,
         "n_val_samples": 3,
         "resume_path": '',
         "pretrain_path": '',
-        "ft_begin_index": 0,
+        "ft_begin_index": 5,
         "no_train": False,
         "no_val": False,
         "test": False,
@@ -171,11 +173,11 @@ def main():
         "no_softmax_in_test": False,
         "no_cuda": False,
         "n_threads": 4,
-        "checkpoint": 10,
+        "checkpoint": 2,
         "no_hflip": False,
         "norm_value": 1,
         "model": 'resnet',
-        "model_depth": 18,
+        "model_depth": 101,
         "resnet_shortcut": 'B',
         "wide_resnet_k": 2,
         "resnext_cardinality": 32,
@@ -186,8 +188,16 @@ def main():
     criterion = nn.CrossEntropyLoss()
     if not opt.no_cuda:
         criterion = criterion.cuda()
+
+
+    from models.resnext import get_fine_tuning_parameters
+
+    # get fine-tune parameters (we fine-tune all of them)
+    # parameters = model.parameters()
+    parameters = get_fine_tuning_parameters(model, opt.ft_begin_index)
+
     optimizer = optim.SGD(
-                model.parameters(),
+                parameters,
                 lr=opt.learning_rate,
                 momentum=opt.momentum,
                 dampening=opt.dampening,
@@ -215,7 +225,6 @@ def main():
                                     opt, val_logger)
 
         scheduler.step(validation_loss)
-
         
         
 if __name__ == '__main__':
