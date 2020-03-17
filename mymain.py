@@ -33,114 +33,17 @@ from models import *
 
 from models.resnext import get_fine_tuning_parameters
 from models import resnext
+import easydict
+from testing import final_test
 
+from datasets.ucf101 import UCF101
 
-def main():
-    # construct model architecture
-    model_name = 'resnext-101-kinetics'
-    model = resnext.resnet101(
-                num_classes=9,
-                shortcut_type='B',
-                cardinality=32,
-                sample_size=112,
-                sample_duration=16)
-
-    # load pretrained weight
-    model = model.cuda()
-    # wrap the current model again in nn.DataParallel / or we can just remove the .module keys.
-    model = nn.DataParallel(model, device_ids=None)
-    # filter out unnecessary keys
-    pretrain = torch.load('/data/qq/CSCE689/pretrain/'+model_name+'.pth')
-    pretrain_dict = pretrain['state_dict']
-    # pretrain_dict_filter = {k: v for k, v in pretrain_dict.items() if k in model_dict}
-
-    pretrain_dict.pop('module.fc.weight')
-    pretrain_dict.pop('module.fc.bias')
-    model_dict = model.state_dict()
-    model_dict.update(pretrain_dict) 
-    model.load_state_dict(model_dict)
-
-
-    # load preprocessed video frames and annotation
-    from datasets.ucf101 import UCF101
-    root_path = '/data/qq/CSCE689/video/'
-    video_path = root_path + 'UCF-music/'  # 'UCF-101-jpg/' 
-    annotation_path = root_path+'ucfTrainTestlist/ucf101_01_music.json'
-
-
-
-    sample_size = 112 # res3d
-    sample_duration = 16 # for res3d
-    norm_value = 1
-    mean = get_mean(norm_value, dataset='kinetics')
-    std = get_std(norm_value)
-    norm_method = Normalize(mean, [1,1,1])
-
-    batch_size = 32
-    n_threads = 6
-
-    spatial_transform = Compose([
-        Scale(sample_size),
-        CornerCrop(sample_size, 'c'),
-        ToTensor(norm_value), norm_method
-    ])
-
-    temporal_transform = LoopPadding(sample_duration)
-    target_transform = ClassLabel() # VideoID()
-
-    # get training data
-    training_data = UCF101(
-        video_path,
-        annotation_path,
-        'training',
-        0,
-        spatial_transform=spatial_transform,
-        temporal_transform=temporal_transform,
-        target_transform=target_transform,
-        sample_duration=16)
-
-    # wrap training data
-    train_loader = torch.utils.data.DataLoader(
-        training_data,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=n_threads,
-        pin_memory=False) # True
-
-    # get validation data
-    val_data = UCF101(
-        video_path,
-        annotation_path,
-        'validation',
-        0,
-        spatial_transform=spatial_transform,
-        temporal_transform=temporal_transform,
-        target_transform=target_transform,
-        sample_duration=16)
-
-    # wrap validation data
-    val_loader = torch.utils.data.DataLoader(
-        val_data,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=n_threads,
-        pin_memory=False) # True
-
-
-
-
-
-    # set hyperparameters 
-
-    import easydict
+def set_opts():
+    
     opt = easydict.EasyDict({
-        "root_path": '',
-        "video_path": 'video_kinetics_jpg',
-        "annotation_path": 'kinetics.json',
-        "result_path": 'results1',
+        "result_path": 'results2',
         "dataset": 'ucf101-music', # 'ucf101',
-        "n_classes": 9, # 101, 
-        "n_finetune_classes": 9, # 101,
+        "n_classes": 9, 
         "sample_size": 112,
         "sample_duration": 16,
         "initial_scale": 1.0,
@@ -158,16 +61,10 @@ def main():
         "optimizer": 'sgd',
         "lr_patience": 10,
         "batch_size": 32,
-        "n_epochs": 20,
+        "n_epochs": 2,
         "begin_epoch": 1,
         "n_val_samples": 3,
-        "resume_path": '',
-        "pretrain_path": '',
         "ft_begin_index": 5,
-        "no_train": False,
-        "no_val": False,
-        "test": False,
-        "test_subset": 'val',
         "scale_in_test": 1.0,
         "crop_position_in_test": 'c',
         "no_softmax_in_test": False,
@@ -177,23 +74,136 @@ def main():
         "no_hflip": False,
         "norm_value": 1,
         "model": 'resnet',
+        "pretained_model_name": 'resnext-101-kinetics',
         "model_depth": 101,
         "resnet_shortcut": 'B',
         "wide_resnet_k": 2,
         "resnext_cardinality": 32,
-        "manual_seed": 1
+        "manual_seed": 1,
+        'test_subset': 'test',
     })
     opt.arch = '{}-{}'.format(opt.model, opt.model_depth)
+    opt.root_path = '/data/qq/CSCE689/video/'
+    opt.video_path = opt.root_path + 'UCF-music/'
+    opt.annotation_path = opt.root_path+'UCF-music-annotation/ucf101_music_with_testing.json'
 
+    return opt
+
+
+def load_pretrained_resnet101(opt):
+    # construct model architecture
+    model = resnext.resnet101(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                cardinality=opt.resnext_cardinality,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+
+    model = model.cuda()
+    # wrap the current model again in nn.DataParallel / or we can just remove the .module keys.
+    model = nn.DataParallel(model, device_ids=None)
+    
+    pretrain = torch.load('/data/qq/CSCE689/pretrain/' + opt.pretained_model_name + '.pth')
+    pretrain_dict = pretrain['state_dict']
+
+    # do not load the last layer
+    pretrain_dict.pop('module.fc.weight')
+    pretrain_dict.pop('module.fc.bias')
+    model_dict = model.state_dict()
+    model_dict.update(pretrain_dict) 
+    model.load_state_dict(model_dict)
+    
+    return model
+
+def get_ucf_data(opt):
+    
+    mean = get_mean(opt.norm_value, dataset='kinetics')
+    std = get_std(opt.norm_value)
+    norm_method = Normalize(mean, [1,1,1])
+
+
+    spatial_transform = Compose([
+        Scale(opt.sample_size),
+        CornerCrop(opt.sample_size, 'c'),
+        ToTensor(opt.norm_value), norm_method
+    ])
+
+    temporal_transform = LoopPadding(opt.sample_duration)
+    target_transform = ClassLabel() # VideoID()
+
+    # get training data
+    training_data = UCF101(
+        opt.video_path,
+        opt.annotation_path,
+        'training',
+        0,
+        spatial_transform=spatial_transform,
+        temporal_transform=temporal_transform,
+        target_transform=target_transform,
+        sample_duration=16)
+
+    # wrap training data
+    train_loader = torch.utils.data.DataLoader(
+        training_data,
+        batch_size=opt.batch_size,
+        shuffle=False,
+        num_workers=opt.n_threads,
+        pin_memory=False) # True
+
+
+    # get validation data
+    val_data = UCF101(
+        opt.video_path,
+        opt.annotation_path,
+        'validation',
+        0,
+        spatial_transform=spatial_transform,
+        temporal_transform=temporal_transform,
+        target_transform=target_transform,
+        sample_duration=16)
+
+    # wrap validation data
+    val_loader = torch.utils.data.DataLoader(
+        val_data,
+        batch_size=opt.batch_size,
+        shuffle=False,
+        num_workers=opt.n_threads,
+        pin_memory=False) 
+
+    
+    # get test data
+    test_data = UCF101(
+        opt.video_path,
+        opt.annotation_path,
+        'testing',
+        0,
+        spatial_transform=spatial_transform,
+        temporal_transform=temporal_transform,
+        target_transform=target_transform,
+        sample_duration=16)
+
+
+    # wrap test data
+    test_loader = torch.utils.data.DataLoader(
+        test_data,
+        batch_size=opt.batch_size,
+        shuffle=False,
+        num_workers=opt.n_threads,
+        pin_memory=False)
+    
+    return train_loader, val_loader, test_loader
+
+def main():
+    
+    opt = set_opts()
+    model = load_pretrained_resnet101(opt)
+    train_loader, val_loader, test_loader = get_ucf_data(opt)
+    
     criterion = nn.CrossEntropyLoss()
     if not opt.no_cuda:
         criterion = criterion.cuda()
-
-
-    from models.resnext import get_fine_tuning_parameters
-
+    
     # get fine-tune parameters (we fine-tune all of them)
-    # parameters = model.parameters()
     parameters = get_fine_tuning_parameters(model, opt.ft_begin_index)
 
     optimizer = optim.SGD(
@@ -226,7 +236,6 @@ def main():
 
         scheduler.step(validation_loss)
         
-        
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES']='2,3,4'
+    os.environ['CUDA_VISIBLE_DEVICES']='2,3'
     main()

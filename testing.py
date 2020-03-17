@@ -50,10 +50,10 @@ def final_test(data_loader, model, opt, class_names):
             if not (i == 0 and j == 0) and targets[j] != previous_video_id:
                 calculate_video_results(output_buffer, previous_video_id,
                                         test_results, class_names)
-                output_buffer = []
                 all_output_buffer[previous_video_id] = [opbf.numpy() for opbf in output_buffer]
+                output_buffer = []
             output_buffer.append(outputs[j].data.cpu())
-            previous_video_id = targets[j].item()
+            previous_video_id = targets[j] # .item()
 
         if (i % 100) == 0:
             with open(
@@ -75,4 +75,4 @@ def final_test(data_loader, model, opt, class_names):
             os.path.join(opt.result_path, '{}.json'.format(opt.test_subset)),
             'w') as f:
         json.dump(test_results, f)
-    return all_output_buffer
+    return test_results, all_output_buffer

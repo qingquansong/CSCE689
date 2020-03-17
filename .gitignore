@@ -106,6 +106,7 @@ ENV/
 
 # pretrained model weights and saved model weights
 pretrain/
-results1/
 results/
+results1/
+results2/
 jupyter/
