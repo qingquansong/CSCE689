@@ -244,5 +244,5 @@ def main():
     test_results, all_output_buffer = final_test(test_loader, model, opt, test_data.class_names)
         
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES']='2,3'
+    os.environ['CUDA_VISIBLE_DEVICES']='0,1'
     main()
