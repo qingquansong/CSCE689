@@ -31,9 +31,9 @@ To run the code, you can follow the youtube video [https://youtu.be/59WkfOapAj8]
 
 
 ### HW5: Run the code & get the results & retrive the final model (in google drive)
-You can directly download the pretrained model and the preprocessed music instrument UCF dataset here [https://drive.google.com/drive/folders/1hg_n3NCw2j2msYdzEmdRHBunCgM4J3qX?usp=sharing](https://drive.google.com/drive/folders/1hg_n3NCw2j2msYdzEmdRHBunCgM4J3qX?usp=sharing). You need to unzip the folder and put “video” and “pretrain” into your root folder and change the root path in the code in order to run your code. And then put "features" under the same path as the “CSCE689 HW5 Song 625007598 Training Script.ipynb".
+You can directly download the pretrained model and the preprocessed music instrument UCF dataset here [https://drive.google.com/open?id=18Uf0FKnVXg_kFHum_SH1cgOoKbRfhguL](https://drive.google.com/open?id=18Uf0FKnVXg_kFHum_SH1cgOoKbRfhguL). You need to unzip the folder and put “video” and “pretrain” into your root folder and change the root path in the code in order to run your code. And then put "features" under the same path as the “CSCE689 HW5 Song 625007598 Training Script.ipynb".
 
-To run the code, you can follow the youtube video [https://youtu.be/59WkfOapAj8](https://youtu.be/59WkfOapAj8) to run the jupyter notebook “CSCE689 HW5 Song 625007598 Training Script.ipynb” and get your results directly in the jupyter notebook. The required figures could be get by running the jupyter script “Generate Figure HW5.ipynb” or you can also check it in the “hw5_results” folders.
+To run the code, you can follow the youtube video [https://youtu.be/rEwFxqJUxYo](https://youtu.be/rEwFxqJUxYo) to run the jupyter notebook “CSCE689 HW5 Song 625007598 Training Script.ipynb” and get your results directly in the jupyter notebook. The required figures could be get by running the jupyter script “Generate Figure HW5.ipynb” or you can also check it in the “hw5_results” folders.
 
 ### Note
 1. The codes are only tested on ubuntu 16.04 system with 2 GPU (GeForce RTX 2080 Ti), CUDA Version: 10.2, torch 1.4.0. You should specify the GPU environment in the code line ``os.environ['CUDA_VISIBLE_DEVICES']='0,1'`` in order to make it work. If you you one GPU, for example, ``os.environ['CUDA_VISIBLE_DEVICES']='0', you should use smaller batch size in order to make the memory available. 
