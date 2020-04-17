@@ -57,23 +57,31 @@ def load_annotation_data(data_file_path):
 
 
 def get_class_labels(data):
-    class_names = []
-    index = 0
-    for node1 in data['taxonomy']:
-        is_leaf = True
-        for node2 in data['taxonomy']:
-            if node2['parentId'] == node1['nodeId']:
-                is_leaf = False
-                break
-        if is_leaf:
-            class_names.append(node1['nodeName'])
+#     class_names = []
+#     index = 0
+#     for node1 in data['taxonomy']:
+#         is_leaf = True
+#         for node2 in data['taxonomy']:
+#             if node2['parentId'] == node1['nodeId']:
+#                 is_leaf = False
+#                 break
+#         if is_leaf:
+#             class_names.append(node1['nodeName'])
 
-    class_labels_map = {}
+#     class_labels_map = {}
 
-    for i, class_name in enumerate(class_names):
-        class_labels_map[class_name] = i
+#     for i, class_name in enumerate(class_names):
+#         class_labels_map[class_name] = i
+     class_labels_map = {'Playing bagpipes': 0,
+                          'Playing harmonica': 1,
+                          'Playing saxophone': 2,
+                          'Playing guitarra': 3,
+                          'Playing flauta': 4,
+                          'Playing piano': 5,
+                          'Playing violin': 6,
+                          'Playing accordion': 7,}
 
-    return class_labels_map
+     return class_labels_map
 
 
 def get_video_names_and_annotations(data, subset):
@@ -85,6 +93,7 @@ def get_video_names_and_annotations(data, subset):
         if this_subset == subset:
             if subset == 'testing':
                 video_names.append('v_{}'.format(key))
+                annotations.append(value['annotations'])
             else:
                 video_names.append('v_{}'.format(key))
                 annotations.append(value['annotations'])
@@ -123,48 +132,54 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
         fps_file_path = os.path.join(video_path, 'fps')
         fps = load_value_file(fps_file_path)
 
-        for annotation in annotations[i]:
-            begin_t = math.ceil(annotation['segment'][0] * fps)
-            end_t = math.ceil(annotation['segment'][1] * fps)
-            if begin_t == 0:
-                begin_t = 1
-            n_frames = end_t - begin_t
+#         if subset == 'testing':
+#             print(annotations)
+        for kk, vv in annotations[i].items():
+            for annotation in vv:
+#                 print(annotation)
+#                 print(fps)
+                begin_t = math.ceil(annotation[0] * fps)
+                end_t = math.ceil(annotation[1] * fps)
+                if begin_t == 0:
+                    begin_t = 1
+                n_frames = end_t - begin_t
 
-            sample = {
-                'video': video_path,
-                'segment': [begin_t, end_t],
-                'fps': fps,
-                'video_id': video_names[i][2:]
-            }
-            if len(annotations) != 0:
-                sample['label'] = class_to_idx[annotation['label']]
-            else:
-                sample['label'] = -1
+                sample = {
+                    'video': video_path,
+                    'segment': [begin_t, end_t],
+                    'fps': fps,
+                    'video_id': video_names[i][2:]
+                }
+    #             if len(annotations) != 0:
+    #                 sample['label'] = class_to_idx[annotation['label']]
+    #             else:
+    #                 sample['label'] = -1
+                sample['label'] = class_to_idx[kk]
 
-            if n_samples_for_each_video == 1:
-                frame_indices = list(range(begin_t, end_t))
-                frame_indices = modify_frame_indices(sample['video'],
-                                                     frame_indices)
-                if len(frame_indices) < 16:
-                    continue
-                sample['frame_indices'] = frame_indices
-                dataset.append(sample)
-            else:
-                if n_samples_for_each_video > 1:
-                    step = max(1,
-                               math.ceil((n_frames - 1 - sample_duration) /
-                                         (n_samples_for_each_video - 1)))
-                else:
-                    step = sample_duration
-                for j in range(begin_t, end_t, step):
-                    sample_j = copy.deepcopy(sample)
-                    frame_indices = list(range(j, j + sample_duration))
-                    frame_indices = modify_frame_indices(
-                        sample_j['video'], frame_indices)
+                if n_samples_for_each_video == 1:
+                    frame_indices = list(range(begin_t, end_t))
+                    frame_indices = modify_frame_indices(sample['video'],
+                                                         frame_indices)
                     if len(frame_indices) < 16:
                         continue
-                    sample_j['frame_indices'] = frame_indices
-                    dataset.append(sample_j)
+                    sample['frame_indices'] = frame_indices
+                    dataset.append(sample)
+                else:
+                    if n_samples_for_each_video > 1:
+                        step = max(1,
+                                   math.ceil((n_frames - 1 - sample_duration) /
+                                             (n_samples_for_each_video - 1)))
+                    else:
+                        step = sample_duration
+                    for j in range(begin_t, end_t, step):
+                        sample_j = copy.deepcopy(sample)
+                        frame_indices = list(range(j, j + sample_duration))
+                        frame_indices = modify_frame_indices(
+                            sample_j['video'], frame_indices)
+                        if len(frame_indices) < 16:
+                            continue
+                        sample_j['frame_indices'] = frame_indices
+                        dataset.append(sample_j)
 
     return dataset, idx_to_class
 
