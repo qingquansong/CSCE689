@@ -35,6 +35,12 @@ You can directly download the pretrained model and the preprocessed music instru
 
 To run the code, you can follow the youtube video [https://youtu.be/rEwFxqJUxYo](https://youtu.be/rEwFxqJUxYo) to run the jupyter notebook “CSCE689 HW5 Song 625007598 Training Script.ipynb” and get your results directly in the jupyter notebook. The required figures could be get by running the jupyter script “Generate Figure HW5.ipynb” or you can also check it in the “hw5_results” folders.
 
+
+### HW6: Run the code & get the results & retrive the final model (in google drive)
+You can directly download the pretrained model and the extracted features here [https://drive.google.com/drive/folders/12vGMRcHILrYC6JtAed_2Ic5cxkJXNgc1?usp=sharing](https://drive.google.com/drive/folders/12vGMRcHILrYC6JtAed_2Ic5cxkJXNgc1?usp=sharing). You need to unzip the folder and put “pretrain” and "features_ucf_all" into your root folder and change the root path in the code in order to run your code. We don't provide the raw data and you may need to prepocess the UCF data using the way listed above and then change all the labels to binary label (music instrumental playing video: 1, other: 0).
+
+To run the code, you can follow the youtube video [https://youtu.be/jqG5H_MTdSs](https://youtu.be/jqG5H_MTdSs) to run the jupyter notebook “CSCE689 HW6 Song 625007598 Training Script UCF.ipynb” and get your results directly in the jupyter notebook. The required figures could be get by running the jupyter script “Generate Figure HW6.ipynb” or you can also check it in the “hw6_results” folders.
+
 ### Note
 1. The codes are only tested on ubuntu 16.04 system with 2 GPU (GeForce RTX 2080 Ti), CUDA Version: 10.2, torch 1.4.0. You should specify the GPU environment in the code line ``os.environ['CUDA_VISIBLE_DEVICES']='0,1'`` in order to make it work. If you you one GPU, for example, ``os.environ['CUDA_VISIBLE_DEVICES']='0', you should use smaller batch size in order to make the memory available. 
 
