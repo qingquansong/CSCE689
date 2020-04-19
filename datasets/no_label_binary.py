@@ -79,31 +79,42 @@ def get_video_names_and_annotations(data, subset):
     return video_names, annotations
 
 
+def get_video_names(root_path):
+    video_names = []
+    for file_name in os.listdir(root_path):
+        video_names.append('{}/{}'.format('?', file_name))
+    return video_names
+
 def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                  sample_duration):
-    data = load_annotation_data(annotation_path)
-    video_names, annotations = get_video_names_and_annotations(data, subset)
-    
-    print(video_names[0])
-    
-    class_to_idx = get_class_labels(data)
-    idx_to_class = {}
-    for name, label in class_to_idx.items():
-        idx_to_class[label] = name
+#     data = load_annotation_data(annotation_path)
+#     video_names, annotations = get_video_names_and_annotations(data, subset)
+#     class_to_idx = get_class_labels(data)
+#     idx_to_class = {}
+#     for name, label in class_to_idx.items():
+#         idx_to_class[label] = name
 
+
+    video_names = get_video_names(root_path)
     dataset = []
     for i in range(len(video_names)):
         if i % 1000 == 0:
             print('dataset loading [{}/{}]'.format(i, len(video_names)))
-
-        video_path = os.path.join(root_path, video_names[i])
+            
+        video_path = os.path.join(root_path, video_names[i].split('/')[1][2:-8], video_names[i].split('/')[1])
+       
+        
         if not os.path.exists(video_path):
             continue
 
         n_frames_file_path = os.path.join(video_path, 'n_frames')
+        
+        
         n_frames = int(load_value_file(n_frames_file_path))
         if n_frames <= 0:
             continue
+        
+                
 
         begin_t = 1
         end_t = n_frames
@@ -113,11 +124,13 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
             'n_frames': n_frames,
             'video_id': video_names[i].split('/')[1]
         }
-        if len(annotations) != 0:
-            sample['label'] = class_to_idx[annotations[i]['label']]
-        else:
-            sample['label'] = -1
+#         if len(annotations) != 0:
+#             sample['label'] = class_to_idx[annotations[i]['label']]
+#         else:
+#             sample['label'] = -1
 
+            
+            
         if n_samples_for_each_video == 1:
             sample['frame_indices'] = list(range(1, n_frames + 1))
             dataset.append(sample)
@@ -133,11 +146,13 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                 sample_j['frame_indices'] = list(
                     range(j, min(n_frames + 1, j + sample_duration)))
                 dataset.append(sample_j)
+            
+                
+                
+    return dataset # , idx_to_class
 
-    return dataset, idx_to_class
 
-
-class UCF101(data.Dataset):
+class NoLabelBinary(data.Dataset):
     """
     Args:
         root (string): Root directory path.
@@ -164,10 +179,14 @@ class UCF101(data.Dataset):
                  target_transform=None,
                  sample_duration=16,
                  get_loader=get_default_video_loader):
-        self.data, self.class_names = make_dataset(
+#         self.data, self.class_names = make_dataset(
+#             root_path, annotation_path, subset, n_samples_for_each_video,
+#             sample_duration)
+
+        self.data = make_dataset(
             root_path, annotation_path, subset, n_samples_for_each_video,
             sample_duration)
-
+    
         self.spatial_transform = spatial_transform
         self.temporal_transform = temporal_transform
         self.target_transform = target_transform
