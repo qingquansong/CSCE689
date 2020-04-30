@@ -114,3 +114,9 @@ try/
 features/
 features-activitynet/
 backup/features/
+extracted_features/
+final_test_results/
+video_jpg/
+
+
+

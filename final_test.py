@@ -224,6 +224,7 @@ def main(args):
             output = model_rxt101(inputs)
             avgpool_test.append(activation['avgpool'].view(len(target), -1).cpu())
             targets_test.append(target)
+            print(avgpool_test[-1].numpy().shape)
 
 
 
