@@ -48,6 +48,18 @@ def main(args):
         
     video_path_jpg = local_path + '/video_jpg/'
 
+
+    if not os.path.exists(video_path_jpg):
+        os.makedirs(video_path_jpg)
+
+    extracted_feature_path = local_path + 'extracted_features'
+    if not os.path.exists(extracted_feature_path):
+        os.makedirs(extracted_feature_path)
+
+    final_results_path = local_path + 'final_test_results'
+    if not os.path.exists(final_results_path):
+        os.makedirs(final_results_path)
+
     os.system('python utils/video_jpg.py' + ' ' + video_path + ' ' + video_path_jpg)
     os.system('python utils/n_frames.py' + ' ' + video_path_jpg)
 
