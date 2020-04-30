@@ -64,6 +64,11 @@ def main(args):
     os.system('python utils/n_frames.py' + ' ' + video_path_jpg)
 
 
+    if args.pretrain_file_path == "":
+        pretrain_file_path = local_path + '/pretrain'
+    else:
+        pretrain_file_path = args.pretrain_file_path
+
 
     import easydict
     opt = easydict.EasyDict({
@@ -185,7 +190,7 @@ def main(args):
 
     ### Load pretrained weight
     # customize the pretrained model path
-    pretrain = torch.load(opt.root_path + 'pretrain/resnext-101-kinetics.pth')
+    pretrain = torch.load(pretrain_file_path + '/resnext-101-kinetics.pth')
     pretrain_dict = pretrain['state_dict']
 
     # do not load the last layer since we want to fine-tune it
@@ -225,10 +230,10 @@ def main(args):
 
 
     avgpool_test_np = np.concatenate([i.numpy() for i in avgpool_test], axis=0)
-    np.save(opt.root_path + 'extracted_features/resnext101_avgpool_test.npy', avgpool_test_np)
+    np.save(opt.root_path + '/extracted_features/resnext101_avgpool_test.npy', avgpool_test_np)
 
     targets_test_np = np.concatenate(np.array(targets_test), axis=0)
-    np.save(opt.root_path + 'extracted_features/class_names_test.npy', targets_test_np)
+    np.save(opt.root_path + '/extracted_features/class_names_test.npy', targets_test_np)
 
 
     # ##### 3D ResNet-50
@@ -250,7 +255,7 @@ def main(args):
 
     ### Load pretrained weight
     # customize the pretrained model path
-    pretrain = torch.load(opt.root_path + 'pretrain/resnet-50-kinetics.pth')
+    pretrain = torch.load(pretrain_file_path + '/resnet-50-kinetics.pth')
     pretrain_dict = pretrain['state_dict']
 
     # do not load the last layer since we want to fine-tune it
@@ -286,17 +291,17 @@ def main(args):
             
         # save the features
         avgpool_test_np = np.concatenate([i.numpy() for i in avgpool_test], axis=0)
-        np.save(opt.root_path + 'extracted_features/resnet50_avgpool_test.npy', avgpool_test_np)    
+        np.save(opt.root_path + '/extracted_features/resnet50_avgpool_test.npy', avgpool_test_np)    
 
 
     # ### Load & fuse the features
 
 
-    x_test_1 = np.load(opt.root_path + 'extracted_features/resnext101_avgpool_test.npy')
-    x_test_2 = np.load(opt.root_path + 'extracted_features/resnet50_avgpool_test.npy')
+    x_test_1 = np.load(opt.root_path + '/extracted_features/resnext101_avgpool_test.npy')
+    x_test_2 = np.load(opt.root_path + '/extracted_features/resnet50_avgpool_test.npy')
     x_test = np.concatenate([x_test_1, x_test_2], axis=1)
 
-    y_test = np.load(opt.root_path + 'extracted_features/class_names_test.npy')
+    y_test = np.load(opt.root_path + '/extracted_features/class_names_test.npy')
 
 
     # ### Load Classification head and predict
@@ -414,6 +419,7 @@ if __name__ == '__main__':
         description="CSCE689 625007598 Qingquan Song Final Test"
     )
     parser.add_argument("--video-file-path", type=str, default="")
+    parser.add_argument("--pretrain-file-path", type=str, default="")
     parser.add_argument("--model", type=str, default="final", choices=["hw4", "hw5",  "hw6",  "hw8",  "final"])
 
     args = parser.parse_args()
