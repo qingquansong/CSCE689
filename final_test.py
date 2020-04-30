@@ -52,11 +52,11 @@ def main(args):
     if not os.path.exists(video_path_jpg):
         os.makedirs(video_path_jpg)
 
-    extracted_feature_path = local_path + 'extracted_features'
+    extracted_feature_path = local_path + '/extracted_features'
     if not os.path.exists(extracted_feature_path):
         os.makedirs(extracted_feature_path)
 
-    final_results_path = local_path + 'final_test_results'
+    final_results_path = local_path + '/final_test_results'
     if not os.path.exists(final_results_path):
         os.makedirs(final_results_path)
 
