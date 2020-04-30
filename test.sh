@@ -5,10 +5,10 @@ GIT_REPO_URL="https://github.tamu.edu/song-3134/CSCE689.git"
 REPO="CSCE689"
 
 # The absolute path of the directory that contains all the testing videos (.mp4 format)
-VIDEO_DIRECTORY_PATH="''"
+VIDEO_DIRECTORY_PATH="./video"
 
 # The absolute path of the pretrained model that contains two pretrained neural networks
-PRETRAIN_DIRECTORY_PATH="''"
+PRETRAIN_DIRECTORY_PATH="./pretrain"
 
 # Model to be tested (select from: hw4, hw5, hw6, hw8, final)
 MODEL_NAME="hw8"
