@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
-import os
 import sys
 import json
 import numpy as np
@@ -39,7 +37,10 @@ import argparse
 
 def main(args):
 
+    import os
+
     local_path = os.getcwd()
+
     if args.video_file_path == "":
         video_path = local_path + '/video/'
     else:
