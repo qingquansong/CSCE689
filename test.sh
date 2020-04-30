@@ -8,7 +8,8 @@ REPO="CSCE689"
 VIDEO_DIRECTORY_PATH="./video"
 
 # The absolute path of the pretrained model that contains two pretrained neural networks
-PRETRAIN_DIRECTORY_PATH="./pretrain"
+# make sure you download them from Google Drive
+PRETRAIN_DIRECTORY_PATH="/data/qq/CSCE689/pretrain"
 
 # Model to be tested (select from: hw4, hw5, hw6, hw8, final)
 MODEL_NAME="hw8"
