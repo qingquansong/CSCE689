@@ -40,7 +40,7 @@ def main(args):
 
     local_path = os.getcwd()
 
-    if args.video_directory_path in ["", " "]:
+    if args.video_directory_path in ["", " ", '']:
         video_path = local_path + '/video/'
     else:
         video_path = args.video_directory_path
@@ -63,7 +63,7 @@ def main(args):
     os.system('python utils/n_frames.py' + ' ' + video_path_jpg)
 
 
-    if args.pretrain_directory_path in ["", " "]:
+    if args.pretrain_directory_path in ["", " ", '']:
         pretrain_directory_path = local_path + '/pretrain'
     else:
         pretrain_directory_path = args.pretrain_directory_path
