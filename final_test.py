@@ -1,36 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import sys
-import json
-import numpy as np
-import torch
-from torch import nn
-from torch import optim
-from torch.optim import lr_scheduler
-
-from opts import parse_opts
-from mean import get_mean, get_std
-from spatial_transforms import (
-    Compose, Normalize, Scale, CenterCrop, CornerCrop, MultiScaleCornerCrop,
-    MultiScaleRandomCrop, RandomHorizontalFlip, ToTensor)
-from temporal_transforms import LoopPadding, TemporalRandomCrop
-from target_transforms import ClassLabel, VideoID
-from target_transforms import Compose as TargetCompose
-from dataset import get_training_set, get_validation_set, get_test_set
-from utils import Logger
-from train import train_epoch
-from validation import val_epoch
-import test
-import collections
-from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
-from joblib import dump, load
-from sklearn import preprocessing
-from scipy import stats
-from sklearn.metrics import accuracy_score
-
-from models import *
 import argparse
 
 
@@ -38,6 +8,36 @@ import argparse
 def main(args):
 
     import os
+    import sys
+    import json
+    import numpy as np
+    import torch
+    from torch import nn
+    from torch import optim
+    from torch.optim import lr_scheduler
+
+    from opts import parse_opts
+    from mean import get_mean, get_std
+    from spatial_transforms import (
+        Compose, Normalize, Scale, CenterCrop, CornerCrop, MultiScaleCornerCrop,
+        MultiScaleRandomCrop, RandomHorizontalFlip, ToTensor)
+    from temporal_transforms import LoopPadding, TemporalRandomCrop
+    from target_transforms import ClassLabel, VideoID
+    from target_transforms import Compose as TargetCompose
+    from dataset import get_training_set, get_validation_set, get_test_set
+    from utils import Logger
+    from train import train_epoch
+    from validation import val_epoch
+    import test
+    import collections
+    from sklearn.svm import LinearSVC
+    from sklearn.svm import SVC
+    from joblib import dump, load
+    from sklearn import preprocessing
+    from scipy import stats
+    from sklearn.metrics import accuracy_score
+
+    from models import *
 
     local_path = os.getcwd()
 
@@ -358,7 +358,7 @@ def main(args):
     tvns = list(y_pred_test_final.keys())
     mp4_path = video_path
     clip_duration_dict = {}
-    import os
+
     from moviepy.editor import VideoFileClip
     i = 0
     for tvn in tvns:
@@ -370,12 +370,7 @@ def main(args):
 
 
     # ### Generate Figures
-
-
     import matplotlib.pyplot as plt
-    import numpy as np
-
-
     for tvn in clip_duration_dict:
         interval = clip_duration_dict[tvn][0]/list(y_test).count(tvn)
         x = np.arange(0, clip_duration_dict[tvn][0], interval) + interval
@@ -392,11 +387,6 @@ def main(args):
 
 
     # ### Generate Json
-
-
-    import numpy as np
-
-
     timeTrueLabel = {}
     for tvn in clip_duration_dict:
         if tvn in y_pred_test_prob:
