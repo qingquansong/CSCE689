@@ -40,10 +40,10 @@ def main(args):
 
     local_path = os.getcwd()
 
-    if args.video_file_path == "":
+    if args.video_directory_path == "":
         video_path = local_path + '/video/'
     else:
-        video_path = args.video_file_path
+        video_path = args.video_directory_path
         
     video_path_jpg = local_path + '/video_jpg/'
 
@@ -63,10 +63,10 @@ def main(args):
     os.system('python utils/n_frames.py' + ' ' + video_path_jpg)
 
 
-    if args.pretrain_file_path == "":
-        pretrain_file_path = local_path + '/pretrain'
+    if args.pretrain_directory_path == "":
+        pretrain_directory_path = local_path + '/pretrain'
     else:
-        pretrain_file_path = args.pretrain_file_path
+        pretrain_directory_path = args.pretrain_directory_path
 
 
     import easydict
@@ -152,7 +152,7 @@ def main(args):
 
     ### Load pretrained weight
     # customize the pretrained model path
-    pretrain = torch.load(pretrain_file_path + '/resnext-101-kinetics.pth')
+    pretrain = torch.load(pretrain_directory_path + '/resnext-101-kinetics.pth')
     pretrain_dict = pretrain['state_dict']
 
     # do not load the last layer since we want to fine-tune it
@@ -216,7 +216,7 @@ def main(args):
 
     ### Load pretrained weight
     # customize the pretrained model path
-    pretrain = torch.load(pretrain_file_path + '/resnet-50-kinetics.pth')
+    pretrain = torch.load(pretrain_directory_path + '/resnet-50-kinetics.pth')
     pretrain_dict = pretrain['state_dict']
 
     # do not load the last layer since we want to fine-tune it
@@ -369,8 +369,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="CSCE689 625007598 Qingquan Song Final Test"
     )
-    parser.add_argument("--video-file-path", type=str, default="")
-    parser.add_argument("--pretrain-file-path", type=str, default="")
+    parser.add_argument("--video-directory-path", type=str, default="")
+    parser.add_argument("--pretrain-directory-path", type=str, default="")
     parser.add_argument("--model", type=str, default="final", choices=["hw4", "hw5",  "hw6",  "hw8",  "final"])
 
     args = parser.parse_args()
