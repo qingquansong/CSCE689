@@ -123,7 +123,7 @@ def main(args):
 
 
     # use two gpu devices on the server, you can customize it depending on how many available gpu devices you have
-    os.environ['CUDA_VISIBLE_DEVICES']='0'
+    # os.environ['CUDA_VISIBLE_DEVICES']='0'
 
 
 
