@@ -6,6 +6,6 @@ REPO="CSCE689"
 git clone $GIT_REPO_URL
 
 cd $REPO
-python final_test.py --video-file-path /data/qq/CSCE689/video/jiang --model hw6 --pretrain-file-path /data/qq/CSCE689/pretrain
+python final_test.py --video-file-path "" --model hw6 --pretrain-file-path ""
 cp ./final_test_results/* .
 
