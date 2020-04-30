@@ -2,15 +2,15 @@
 # coding: utf-8
 
 import argparse
-
+from models import *
 
 
 def main(args):
 
     import os
+    import numpy as np
     import sys
     import json
-    import numpy as np
     import torch
     from torch import nn
     from torch import optim
@@ -37,7 +37,6 @@ def main(args):
     from scipy import stats
     from sklearn.metrics import accuracy_score
 
-    from models import *
 
     local_path = os.getcwd()
 
