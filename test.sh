@@ -7,5 +7,5 @@ git clone $GIT_REPO_URL
 
 cd $REPO
 python final_test.py --video-file-path /data/qq/CSCE689/video/jiang --model hw6
-cp final_test_results/* .
+cp ./final_test_results/* .
 

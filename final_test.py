@@ -401,7 +401,7 @@ if __name__ == '__main__':
         description="CSCE689 625007598 Qingquan Song Final Test"
     )
     parser.add_argument("--video-file-path", type=str, default="")
-    parser.add_argument("---model", type=str, default="final", choices=["hw4", "hw5",  "hw6",  "hw8",  "final"])
+    parser.add_argument("--model", type=str, default="final", choices=["hw4", "hw5",  "hw6",  "hw8",  "final"])
 
     args = parser.parse_args()
     main(args)
