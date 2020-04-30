@@ -71,60 +71,23 @@ def main(args):
 
     import easydict
     opt = easydict.EasyDict({
-        "result_path": 'results2',
-        "dataset": 'ucf101-music', # 'ucf101',
         "n_classes": 2, 
         "sample_size": 112,
         "sample_duration": 64,
-        "initial_scale": 1.0,
-        "n_scales": 5,
-        "scale_step": 0.84089641525,
-        "train_crop": 'corner',
-        "learning_rate": 0.1,
-        "momentum": 0.9,
-        "dampening": 0.9,
-        "weight_decay": 0.001,
-        "mean_dataset": 'kinetics',
-        "no_mean_norm": False,
-        "std_norm": False,
-        "nesterov": False,
-        "optimizer": 'sgd',
-        "lr_patience": 10,
         "batch_size": 16,
-        "n_epochs": 2,
-        "begin_epoch": 1,
-        "n_val_samples": 3,
-        "ft_begin_index": 5,
-        "scale_in_test": 1.0,
-        "crop_position_in_test": 'c',
-        "no_softmax_in_test": False,
-        "no_cuda": False,
         "n_threads": 4,
-        "checkpoint": 2,
-        "no_hflip": False,
         "norm_value": 1,
-        "model": 'resnet',
-        "pretained_model_name": 'resnext-101-kinetics',
-        "model_depth": 101,
         "resnet_shortcut": 'B',
-        "wide_resnet_k": 2,
         "resnext_cardinality": 32,
-        "manual_seed": 1,
-        'test_subset': 'test',
     })
-    opt.arch = '{}-{}'.format(opt.model, opt.model_depth)
     opt.root_path =  local_path
     opt.video_path = video_path_jpg
-    # opt.annotation_path = opt.root_path + 'video/UCF-music-annotation/ucf_binary_music_annotation.json'
-
 
 
 
 
     # use two gpu devices on the server, you can customize it depending on how many available gpu devices you have
-    # os.environ['CUDA_VISIBLE_DEVICES']='0'
-
-
+    os.environ['CUDA_VISIBLE_DEVICES']='6'
 
 
 
@@ -155,7 +118,7 @@ def main(args):
         spatial_transform=spatial_transform,
         temporal_transform=temporal_transform,
         target_transform=target_transform,
-        sample_duration=64)
+        sample_duration=opt.sample_duration)
 
 
     # wrap test data
@@ -224,8 +187,6 @@ def main(args):
             output = model_rxt101(inputs)
             avgpool_test.append(activation['avgpool'].view(len(target), -1).cpu())
             targets_test.append(target)
-            print(avgpool_test[-1].numpy().shape)
-
 
 
 
