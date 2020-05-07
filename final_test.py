@@ -73,7 +73,7 @@ def main(args):
     opt = easydict.EasyDict({
         "n_classes": 2, 
         "sample_size": 112,
-        "sample_duration": 64,
+        "sample_duration": 16,
         "batch_size": 16,
         "n_threads": 4,
         "norm_value": 1,
