@@ -12,7 +12,7 @@ VIDEO_DIRECTORY_PATH="./video"
 PRETRAIN_DIRECTORY_PATH="/data/qq/CSCE689/pretrain"
 
 # Model to be tested (select from: hw4, hw5, hw6, hw8, final)
-MODEL_NAME="final"
+MODEL_NAME="hw8"
 
 
 # You may need to install the required packages by yourself, I do not include the requirement.txt here.
