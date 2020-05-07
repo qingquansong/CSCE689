@@ -343,7 +343,7 @@ def main(args):
         plt.xlabel ('time/sec')
         plt.ylabel ('pred score for ground truth label')
         plt.title("Ground Truth Label:  " + tvn  + "\n Model Avg. Predict Score:  " + str(np.mean(y))) # str(real_prediction_dict[tvn]['score'])
-        plt.savefig(opt.root_path + "/final_test_results/625007598_" + tvn, bbox_inches='tight')
+        plt.savefig(opt.root_path + "/final_test_results/" + tvn + args.model + "_UIN-625007598", bbox_inches='tight')
         plt.close()
 
 
@@ -360,7 +360,7 @@ def main(args):
 
 
 
-    with open(opt.root_path + '/final_test_results/625007598_timeLabel.json', 'w') as fp:
+    with open(opt.root_path + '/final_test_results/timeLabel_' + args.model + '_UIN-625007598.json', 'w') as fp:
         json.dump(timeTrueLabel, fp)
 
 
