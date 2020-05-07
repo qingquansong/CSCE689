@@ -343,7 +343,7 @@ def main(args):
         plt.xlabel ('time/sec')
         plt.ylabel ('pred score for ground truth label')
         plt.title("Ground Truth Label:  " + tvn  + "\n Model Avg. Predict Score:  " + str(np.mean(y))) # str(real_prediction_dict[tvn]['score'])
-        plt.savefig(opt.root_path + "/final_test_results/" + tvn + args.model + "_UIN-625007598", bbox_inches='tight')
+        plt.savefig(opt.root_path + "/final_test_results/" + tvn + '_' + args.model + "_UIN-625007598", bbox_inches='tight')
         plt.close()
 
 
